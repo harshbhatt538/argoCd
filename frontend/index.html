@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Fullstack App</title>
+</head>
+<body style="text-align: center; font-family: sans-serif; padding-top: 50px;">
+    <h1>DevOps Production POC</h1>
+    <p>Frontend: <strong>Running on Nginx</strong></p>
+    <p>Backend Status: <strong id="status">Loading...</strong></p>
+
+    <script>
+        // Call the API (The Ingress routes /api to the Python backend)
+        fetch('/api/')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('status').innerText = 
+                    data.message + " | " + data.db_status;
+                document.getElementById('status').style.color = "green";
+            })
+            .catch(error => {
+                document.getElementById('status').innerText = "Error connecting to API";
+                document.getElementById('status').style.color = "red";
+                console.error('Error:', error);
+            });
+    </script>
+</body>
+</html>

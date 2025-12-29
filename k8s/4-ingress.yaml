@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fullstack-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  ingressClassName: traefik
+  rules:
+  - http:
+      paths:
+      # Rule 1: API calls go to Backend
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: fastapi-service
+            port:
+              number: 8000
+      # Rule 2: Everything else goes to Frontend
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: react-service
+            port:
+              number: 80

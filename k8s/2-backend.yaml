@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-backend
+  labels:
+    app: fastapi-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi-backend
+  template:
+    metadata:
+      labels:
+        app: fastapi-backend
+    spec:
+      containers:
+      - name: api
+        # USING YOUR CUSTOM IMAGE
+        image: harshbhatt12/backend:v1
+        ports:
+        - containerPort: 80
+        env:
+        # 1. Inject Secrets (Username/Pass)
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: username
+        - name: DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: password
+        # 2. Tell App where the DB lives
+        - name: DB_HOST
+          value: "postgres-service"
+        - name: DB_NAME
+          value: "appdb"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8000   # Service Port (Inter-cluster communication)
+    targetPort: 80 # Container Port (Where Uvicorn is listening)
+  selector:
+    app: fastapi-backend
